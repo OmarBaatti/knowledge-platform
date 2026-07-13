@@ -4,14 +4,18 @@ import com.deencord.exception.KnowledgeLoadException;
 import com.deencord.factory.KnowledgeFactory;
 import com.deencord.model.Category;
 import com.deencord.model.Lesson;
+import com.deencord.util.LoggerConfig;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.logging.Logger;
 import java.util.stream.Stream;
 
 public class KnowledgeRepository {
+
+    private static final Logger logger = LoggerConfig.getLogger();
     private final Path knowledgeDirectory;
 
     public KnowledgeRepository(String directoryPath) {
@@ -19,11 +23,14 @@ public class KnowledgeRepository {
     }
 
     public Category loadKnowledgeBase() {
+        logger.info("Loading knowledge from: " + knowledgeDirectory);
         try {
             if(!Files.exists(knowledgeDirectory)) {
                 throw new IOException("Knowledge directory does not exist");
             }
-            return loadCategory(knowledgeDirectory);
+            Category category = loadCategory(knowledgeDirectory);
+            logger.info("Knowledge loading completed.");
+            return category;
         } catch (IOException e) {
             throw new KnowledgeLoadException("Failed to load knowledge base", e);
         }
