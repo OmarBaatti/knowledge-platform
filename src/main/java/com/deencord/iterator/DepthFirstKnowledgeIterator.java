@@ -3,14 +3,16 @@ package com.deencord.iterator;
 import com.deencord.model.Category;
 import com.deencord.model.KnowledgeComponent;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.List;
 import java.util.Stack;
 
 public class DepthFirstKnowledgeIterator implements KnowledgeIterator{
-    private Stack<KnowledgeComponent> stack;
+    private Deque<KnowledgeComponent> stack;
 
     public DepthFirstKnowledgeIterator(KnowledgeComponent root) {
-        stack = new Stack<>();
+        stack = new ArrayDeque<>();
         stack.push(root);
     }
 

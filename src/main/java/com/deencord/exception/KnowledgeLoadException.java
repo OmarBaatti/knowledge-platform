@@ -1,6 +1,6 @@
 package com.deencord.exception;
 
-public class KnowledgeLoadException extends RuntimeException {
+public class KnowledgeLoadException extends AppException {
     public KnowledgeLoadException (String message) {
         super(message);
     }
