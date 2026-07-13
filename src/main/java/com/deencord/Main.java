@@ -40,7 +40,7 @@ public class Main {
     private static void runSearchLoop(KnowledgeService knowledgeService, SearchService searchService) {
         try (Scanner scanner = new Scanner(System.in)) {
             while (true) {
-                System.out.println("Enter a search keyword (or 'exit' to quit): ");
+                System.out.print("Enter a search keyword (or 'exit' to quit): ");
                 String input = scanner.nextLine();
 
                 if (input.trim().equalsIgnoreCase("exit")) {
