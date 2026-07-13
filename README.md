@@ -54,9 +54,19 @@ pending...
 - No markdown rendering
 - CLI-only Interface
 - No use of User and Bookmark
-...
+- Author attribute for lessons is unused
 
 
 
-
-Project structure...
+## 6. Project structure
+```
+src/main/java/com/deencord/
+├── Main.java                # Entry point, CLI loop
+├── exception/               # AppException hierarchy
+├── factory/                 # KnowledgeFactory (Factory pattern)
+├── iterator/                # KnowledgeIterator, DepthFirstKnowledgeIterator (Iterator pattern)
+├── model/                   # KnowledgeComponent, Category, Lesson, User, Bookmark (Composite pattern)
+├── repository/              # KnowledgeRepository (Java I/O, filesystem loading)
+├── service/                 # KnowledgeService, SearchService, UserService
+└── util/                    # InputValidator, AppConfig, LoggerConfig
+```
