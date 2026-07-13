@@ -32,7 +32,7 @@ Core capabilities:
 
 
 ## 3. Setup and Execution Instructions
-```
+```bash
 git clone https://github.com/OmarBaatti/knowledge-platform.git
 cd knowledge-platform
 
