@@ -3,6 +3,7 @@ package com.deencord.model;
 import com.deencord.iterator.DepthFirstKnowledgeIterator;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -24,7 +25,7 @@ public class Category implements KnowledgeComponent {
     }
 
     public List<KnowledgeComponent> getChildren() {
-        return children;
+        return Collections.unmodifiableList(children);
     }
 
     @Override

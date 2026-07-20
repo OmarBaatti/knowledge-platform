@@ -36,17 +36,110 @@ git clone https://github.com/OmarBaatti/knowledge-platform.git
 cd knowledge-platform
 
 ./gradlew test
-./gradlew run
 
-# Knowledge env path
+# custom knowledge env path
 $env:DEENCORD_KNOWLEDGE_PATH="C:\path\to\knowledge" # Windows Powershell
-export DEENCORD_KNOWLEDGE_PATH=/absolute/path/to/knowledge # MacOS/Linux 
-./gradlew run
+export DEENCORD_KNOWLEDGE_PATH=/absolute/path/to/knowledge # MacOS/Linux
+
+./gradlew run --console=plain
 ```
 
 ## 4. UML Diagrams
----- class + architectural ----
-pending...
+### Class diagram
+```mermaid
+classDiagram
+    class KnowledgeComponent {
+        <<interface>>
+        +getName() String
+        +display() void
+        +iterator() Iterator~KnowledgeComponent~
+    }
+    class Category {
+        -String name
+        -List~KnowledgeComponent~ children
+        +add(KnowledgeComponent) void
+        +remove(KnowledgeComponent) void
+        +getChildren() List~KnowledgeComponent~
+    }
+    class Lesson {
+        -String title
+        -String markdownContent
+        -String author
+        +getMarkdownContent() String
+        +updateContent(String) void
+    }
+    class KnowledgeFactory {
+        +createCategory(String) Category
+        +createLesson(String, String, String) Lesson
+    }
+    class KnowledgeIterator {
+        <<interface>>
+    }
+    class DepthFirstKnowledgeIterator {
+        -Deque~KnowledgeComponent~ stack
+        +hasNext() boolean
+        +next() KnowledgeComponent
+    }
+    class KnowledgeRepository {
+        -Path knowledgeDirectory
+        +loadKnowledgeBase() Category
+    }
+    class KnowledgeService {
+        +loadKnowledge() void
+        +displayKnowledge() void
+        +getIterator() Iterator
+    }
+    class SearchService {
+        +search(Iterator, String) List~KnowledgeComponent~
+    }
+    class AppException {
+        <<abstract>>
+    }
+    class KnowledgeLoadException
+    class InvalidKnowledgeException
+    class KeywordSearchException
+
+    KnowledgeComponent <|.. Category
+    KnowledgeComponent <|.. Lesson
+    Category "1" o-- "many" KnowledgeComponent : children
+    KnowledgeIterator <|.. DepthFirstKnowledgeIterator
+    DepthFirstKnowledgeIterator ..> Category : traverses
+    KnowledgeFactory ..> Category : creates
+    KnowledgeFactory ..> Lesson : creates
+    KnowledgeFactory ..> InvalidKnowledgeException : throws
+    KnowledgeRepository ..> KnowledgeFactory : uses
+    KnowledgeRepository ..> KnowledgeLoadException : throws
+    KnowledgeService --> KnowledgeRepository
+    SearchService ..> KeywordSearchException : throws
+    AppException <|-- KnowledgeLoadException
+    AppException <|-- InvalidKnowledgeException
+    AppException <|-- KeywordSearchException
+```
+
+### Architectural diagram:
+```mermaid
+flowchart TD
+    Main[Main.java] --> Config[AppConfig]
+    Main --> Repo[KnowledgeRepository]
+    Main --> KS[KnowledgeService]
+    Main --> SS[SearchService]
+    Main --> IV[InputValidator]
+
+    KS --> Repo
+    Repo -->|reads .md files| FS[(Filesystem: knowledge/)]
+    Repo -->|builds| Tree[Category/Lesson Tree]
+    KS --> Tree
+    SS -->|traverses via| Iterator[DepthFirstKnowledgeIterator]
+    Iterator --> Tree
+
+    Main -->|logs| Logger[LoggerConfig]
+    Repo -->|logs| Logger
+    SS -->|logs| Logger
+
+    Repo -->|wraps IOException| Exc[AppException hierarchy]
+    IV -->|throws on bad input| Exc
+    Exc -->|caught & shielded| Main
+```
 
 ## 5. Known Limitations and Future Work
 - Single threaded
