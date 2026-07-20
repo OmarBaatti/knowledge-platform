@@ -14,22 +14,21 @@ Core capabilities:
 
 ## 2. Technologies and Patterns Used
 ### Design Patterns
-| Pattern                 | Where                                                                           | Why |
-|-------------------------|---------------------------------------------------------------------------------|---|
-| **Factory**             | `factory/KnowledgeFactory.java`                                                 ||
-| **Composite**           | `model/KnowledgeComponent.java`, `model/Category.java`,`model/Lesson.java`      ||
-| **Iterator**            | `iterator/KnowledgeIterator.java` , `iterator/DepthFirstKnowledgeIterator.java` ||
-| **Exception Shielding** | `exception/AppException.java`                                                   ||
+| Pattern                 | Where                                                                 | Why                                                                                                                                                                                                                                     |
+|-------------------------|-----------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Factory**             | `factory/KnowledgeFactory.java`                                       | Centralizes and validates creation of `Category`/`Lesson`, so invalid knowledge objects (blank names, empty content) can never be constructed from anywhere in the app.                                                                 |
+| **Composite**           | `model/KnowledgeComponent.java`, `Category.java`, `Lesson.java`       | Categories and lessons need to be treated uniformly (display, iterate) despite categories being containers and lessons being leaves. Composite lets `Main`/`SearchService` work with one type instead of branching on tree versus leaf. |
+| **Iterator**            | `iterator/KnowledgeIterator.java`, `DepthFirstKnowledgeIterator.java` | Separates the traversal logic from the Category class, making it easier to iterate through the knowledge tree and allowing different traversal strategies to be added in the future if needed.                                          |
+| **Exception Shielding** | `exception/AppException.java` + subclasses                            | Low-level failures (`IOException`, bad input) are translated into application specific exceptions with safe messages, so `Main` never leaks stack traces or filesystem details to the console.                                          |
 
 ### Technologies
-| Technology    | Where                                                                                                                   | Notes |
-|---------------|-------------------------------------------------------------------------------------------------------------------------|-------|
-| **Collections**   | `Category` (`List<KnowledgeComponent>`), `DepthFirstKnowledgeIterator` (`Deque<KnowledgeComponent>`), `User` (`Set<Lesson>`) ||
-| **Generics**      | `List<KnowledgeComponent>`, `Iterator<KnowledgeComponent>`, `Set<Lesson>`                                                                                                                        ||
-| **Java I/O**      | `repository/KnowledgeRepository.java` `Main.java`                                                                               ||
-| **Logging**       | `util/LoggerConfig.java`                                                                                                ||
-| **JUnit Testing** | `src/test/java/...`                                                                                                     ||
-
+| Technology        | Where                                                                                                    | Notes                                                                                                                                            |
+|-------------------|----------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Collections**   | `Category` (`List<KnowledgeComponent>`), `DepthFirstKnowledgeIterator` (`Deque`), `User` (`Set<Lesson>`) | `Deque` used as a stack for DFS traversal; `Set` avoids duplicate lesson completions.                                                            |
+| **Generics**      | `List<KnowledgeComponent>`, `Iterator<KnowledgeComponent>`, `Set<Lesson>`                                | Currently limited to generic standard library collections; no custom generic type/method yet (see Limitations).                                  |
+| **Java I/O**      | `repository/KnowledgeRepository.java`                                                                    | Uses NIO.2 (`Files`, `Path`, `Files.list`, `Files.readString`) to recursively load the folder tree into `Category`/`Lesson` objects.             |
+| **Logging**       | `util/LoggerConfig.java`                                                                                 | Central `java.util.logging.Logger` used across `Main`, `KnowledgeRepository`, `SearchService`, `AppConfig` for startup, load, and search events. |
+| **JUnit Testing** | `src/test/java/...`                                                                                      | Unit tests cover `KnowledgeFactory`, `DepthFirstKnowledgeIterator`, `SearchService`, `KnowledgeRepository`, and `InputValidator`.                |
 
 ## 3. Setup and Execution Instructions
 ```bash

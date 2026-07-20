@@ -41,8 +41,13 @@ public class Main {
         try (Scanner scanner = new Scanner(System.in)) {
             while (true) {
                 System.out.print("Enter a search keyword (or 'exit' to quit): ");
-                String input = scanner.nextLine();
-
+                String input;
+                try {
+                    input = scanner.nextLine();
+                } catch (Exception e) {
+                    logger.log(Level.SEVERE, "Failed reading the user input: ", e);
+                    return;
+                }
                 if (input.trim().equalsIgnoreCase("exit")) {
                     break;
                 }
