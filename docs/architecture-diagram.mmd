@@ -1,0 +1,67 @@
+flowchart TD
+    subgraph Presentation["Presentation Layer"]
+        Main["Main.java<br/>CLI loop / entry point"]
+    end
+
+    subgraph Service["Service Layer"]
+        KS["KnowledgeService"]
+        SS["SearchService"]
+        US["UserService"]
+    end
+
+    subgraph Domain["Domain / Model Layer"]
+        KC["KnowledgeComponent interface"]
+        Cat["Category (Composite)"]
+        Les["Lesson (Leaf)"]
+        Usr["User"]
+        Bkm["Bookmark"]
+        Iter["KnowledgeIterator / DepthFirstKnowledgeIterator"]
+    end
+
+    subgraph Persistence["Persistence Layer"]
+        Repo["KnowledgeRepository (Java NIO.2 I/O)"]
+        Fact["KnowledgeFactory (validated object creation)"]
+    end
+
+    subgraph CrossCutting["Cross-Cutting Concerns"]
+        Val["InputValidator (sanitization)"]
+        Cfg["AppConfig (env-based config)"]
+        Log["LoggerConfig (java.util.logging)"]
+        Exc["AppException hierarchy (exception shielding)"]
+    end
+
+    FS["Filesystem knowledge/*.md"]
+
+    Main --> KS
+    Main --> SS
+    Main --> US
+    Main --> Val
+    Main --> Cfg
+    Main --> Log
+
+    KS --> Repo
+    KS --> Iter
+    KS --> Val
+    SS --> Iter
+    US --> Usr
+    US --> Bkm
+
+    Cat -.implements.-> KC
+    Les -.implements.-> KC
+    Cat --> Iter
+    Usr --> Bkm
+
+    Repo --> Fact
+    Repo --> FS
+    Fact --> Cat
+    Fact --> Les
+
+    Repo -.throws.-> Exc
+    Fact -.throws.-> Exc
+    Val -.throws.-> Exc
+    Main -.catches.-> Exc
+
+    Repo --> Log
+    KS --> Log
+    SS --> Log
+    US --> Log

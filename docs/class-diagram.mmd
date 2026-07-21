@@ -1,0 +1,164 @@
+classDiagram
+    class KnowledgeComponent {
+        <<interface>>
+        +getName() String
+        +display() void
+        +iterator() Iterator~KnowledgeComponent~
+    }
+
+    class Category {
+        -String name
+        -List~KnowledgeComponent~ children
+        +add(KnowledgeComponent) void
+        +remove(KnowledgeComponent) void
+        +getChildren() List~KnowledgeComponent~
+        +getName() String
+        +display() void
+        +iterator() Iterator~KnowledgeComponent~
+    }
+
+    class Lesson {
+        -String title
+        -String markdownContent
+        -String author
+        +getMarkdownContent() String
+        +getAuthor() String
+        +updateContent(String) void
+        +getName() String
+        +display() void
+        +iterator() Iterator~KnowledgeComponent~
+    }
+
+    class User {
+        -String id
+        -String username
+        -Set~Lesson~ completedLessons
+        -List~Bookmark~ bookmarks
+        +completeLesson(Lesson) void
+        +addBookmark(Bookmark) void
+        +getProgress(int) double
+        +getUsername() String
+    }
+
+    class Bookmark {
+        -Lesson lesson
+        -LocalDateTime createdAt
+        +getLesson() Lesson
+        +getCreatedAt() LocalDateTime
+    }
+
+    class KnowledgeIterator {
+        <<interface>>
+    }
+
+    class DepthFirstKnowledgeIterator {
+        -Deque~KnowledgeComponent~ stack
+        +hasNext() boolean
+        +next() KnowledgeComponent
+    }
+
+    class KnowledgeFactory {
+        <<factory>>
+        +createCategory(String)$ Category
+        +createLesson(String, String, String)$ Lesson
+        -validateName(String)$ void
+    }
+
+    class KnowledgeRepository {
+        -Path knowledgeDirectory
+        +loadKnowledgeBase() Category
+        -loadCategory(Path) Category
+        -loadLesson(Path) Lesson
+    }
+
+    class KnowledgeService {
+        -KnowledgeRepository repository
+        -Category knowledgeBase
+        +loadKnowledge() void
+        +getKnowledgeBase() Category
+        +displayKnowledge() void
+        +getIterator() Iterator~KnowledgeComponent~
+        +findLessonByName(String) Lesson
+        +countLessons() int
+    }
+
+    class SearchService {
+        +search(Iterator, String) List~KnowledgeComponent~
+    }
+
+    class UserService {
+        +completeLesson(User, Lesson) void
+        +bookmarkLesson(User, Lesson) void
+        +getProgress(User, int) double
+        +getBookmarks(User) List~Bookmark~
+    }
+
+    class InputValidator {
+        <<utility>>
+        +sanitizeSearchKeyword(String)$ String
+    }
+
+    class AppConfig {
+        <<utility>>
+        +getKnowledgePath()$ String
+    }
+
+    class LoggerConfig {
+        <<utility>>
+        +getLogger()$ Logger
+    }
+
+    class AppException {
+        <<abstract>>
+        #AppException(String)
+        #AppException(String, Throwable)
+    }
+
+    class InvalidKnowledgeException
+    class KeywordSearchException
+    class KnowledgeLoadException
+    class KnowledgeSaveException
+    class UserOperationException
+
+    class Main {
+        +main(String[])$ void
+    }
+
+    KnowledgeComponent <|.. Category
+    KnowledgeComponent <|.. Lesson
+    KnowledgeIterator <|.. DepthFirstKnowledgeIterator
+    Category "1" *-- "many" KnowledgeComponent : children
+    Category ..> DepthFirstKnowledgeIterator : creates
+    User "1" *-- "many" Bookmark : has
+    Bookmark --> Lesson : references
+    User "1" o-- "many" Lesson : completedLessons
+
+    KnowledgeFactory ..> Category : creates
+    KnowledgeFactory ..> Lesson : creates
+    KnowledgeFactory ..> InvalidKnowledgeException : throws
+
+    KnowledgeRepository --> KnowledgeFactory : uses
+    KnowledgeRepository ..> KnowledgeLoadException : throws
+    KnowledgeRepository --> Category : builds
+
+    KnowledgeService --> KnowledgeRepository : uses
+    KnowledgeService --> InputValidator : uses
+    KnowledgeService --> Category : holds
+
+    SearchService --> KnowledgeComponent : searches
+    UserService --> User : manages
+    UserService --> Bookmark : creates
+
+    Main --> KnowledgeService : uses
+    Main --> SearchService : uses
+    Main --> UserService : uses
+    Main --> InputValidator : uses
+    Main --> AppConfig : uses
+    Main --> KnowledgeRepository : creates
+    Main --> User : creates
+
+    AppException <|-- InvalidKnowledgeException
+    AppException <|-- KeywordSearchException
+    AppException <|-- KnowledgeLoadException
+    AppException <|-- KnowledgeSaveException
+    AppException <|-- UserOperationException
