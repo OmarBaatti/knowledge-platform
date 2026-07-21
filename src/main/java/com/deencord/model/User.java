@@ -1,17 +1,18 @@
 package com.deencord.model;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class User {
     private String id;
     private String username;
     private Set<Lesson> completedLessons;
+    private List<Bookmark> bookmarks;
 
     public User(String id, String username) {
         this.id = id;
-        this.username = username;
+        this.username = username.isBlank() ? "guest" : username;
         this.completedLessons = new HashSet<>();
+        this.bookmarks = new ArrayList<>();
     }
 
     public void completeLesson(Lesson lesson) {
@@ -20,6 +21,14 @@ public class User {
 
     public Set<Lesson> getCompletedLessons() {
         return completedLessons;
+    }
+
+    public void addBookmark (Bookmark bookmark) {
+        bookmarks.add(bookmark);
+    }
+
+    public List<Bookmark> getBookmarks() {
+        return Collections.unmodifiableList(bookmarks);
     }
 
     public double getProgress(int totalLessons) {
